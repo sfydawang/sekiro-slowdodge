@@ -21,6 +21,18 @@
 - **画面**：像"时间穿梭"的镜头特写——从画面中心向四周轻微拉长 + 一点点推近，出现 120ms、结束 420ms 淡出。
 - **范围自适配**：按每一招的实测射程学习（门限 = 实测 + 余量），另有 `tight` / `loose` 两档可调。
 
+## Features (English)
+
+- **Successful dodge → slow motion**: after you truly evade an attack that would have hit you, the world drops to **0.25x** for up to **1 second** (real time).
+- **You pick the next move**: press **attack / combat art / dodge again** and the slow ends **instantly**; do nothing and it ends by itself after 1s.
+- **Action unlock**: during the slow your own actions play at **2x**, so the dodge's action-lock no longer drags — you can really follow up with an attack or a prosthetic (e.g. Shadowrush).
+- **Invincibility**: **none** at the trigger; **full invincibility during the slow**; plus **0.25s** after a normal end (covers hits a step-dodge cannot avoid).
+- **Cancel rules**: taking a hit / a **zero-damage hit reaction** (e.g. Owl's stomp) / being launched / **grabs** end the slow immediately; poison and DoT do **not** cancel it.
+- **Strict by design**: the attack had to be going to connect (hit frames + within reach + no damage taken). Distance is measured **at the moment you press dodge**, so sideways and backward dodges count too.
+- **Self-adapting range**: per-move reach is learned from what actually hits you; `tight` / `loose` presets available.
+- **Subtle visual**: a light radial "time-warp" stretch from the screen center (120ms in / 420ms out), disable with `nofx`.
+
+> Status: **demo**. Known limitations are listed below — in particular there is **no audio** (see below why).
 ## 安装（需要 me3）
 
 1. 安装 [me3](https://github.com/garyttierney/me3)。
