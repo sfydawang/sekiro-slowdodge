@@ -21,7 +21,7 @@
 - **画面**：像"时间穿梭"的镜头特写——从画面中心向四周轻微拉长 + 一点点推近，出现 120ms、结束 420ms 淡出。
 - **范围自适配**：按每一招的实测射程学习（门限 = 实测 + 余量），另有 `tight` / `loose` 两档可调。
 
-## Features (English)
+## Features 
 
 - **Successful dodge → slow motion**: after you truly evade an attack that would have hit you, the world drops to **0.25x** for up to **1 second** (real time).
 - **You pick the next move**: press **attack / combat art / dodge again** and the slow ends **instantly**; do nothing and it ends by itself after 1s.
