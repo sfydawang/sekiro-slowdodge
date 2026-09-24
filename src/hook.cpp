@@ -21,10 +21,52 @@
 #include <ctype.h>
 #include <tlhelp32.h>
 
-static const char* LOGPATH = "C:\\Users\\47297\\Desktop\\hook.txt";
-static const char* MODEPATH = "C:\\Users\\47297\\Desktop\\MODE.txt";
-static const char* TIMEPATH = "C:\\Users\\47297\\Desktop\\timeline.txt";
-static const char* CHARPATH = "C:\\Users\\47297\\Desktop\\chars.txt";
+// ★★★ v131: 路径不再写死 —— 全部改成"跟着 DLL 走"(DLL 所在目录)。
+//   原因: 发布给别人时 C:\Users\47297\... 根本不存在, 日志/配置会全废。
+//   MODE.txt 额外做了一次回退: 优先找 DLL 同目录的 MODE.txt, 找不到就用桌面上的
+//   (作者本机的习惯保持可用, 别人也能把 MODE.txt 放在 DLL 旁边)。
+static char g_modDir[MAX_PATH] = {0};
+static const char* mod_dir(void)
+{
+    if (g_modDir[0] == 0)
+    {
+        char p[MAX_PATH] = {0};
+        HMODULE hm = NULL;
+        GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           (LPCSTR)(uintptr_t)&mod_dir, &hm);
+        if (hm != NULL && GetModuleFileNameA(hm, p, MAX_PATH) > 0)
+        {
+            char* s = strrchr(p, '\\');
+            if (s != NULL) *s = 0;
+            lstrcpynA(g_modDir, p, MAX_PATH);
+        }
+    }
+    return g_modDir;
+}
+#define PATH_FN(name, file) \
+    static const char* name(void) { static char b[MAX_PATH]; sprintf(b, "%s\\" file, mod_dir()); return b; }
+PATH_FN(P_LOG,  "hook.txt")
+PATH_FN(P_TIME, "timeline.txt")
+PATH_FN(P_CHAR, "chars.txt")
+PATH_FN(P_SLOW, "slow.txt")
+PATH_FN(P_WAV,  "assets\\fx_warp.wav")
+static const char* P_MODE(void)
+{
+    static char b[MAX_PATH], t[MAX_PATH];
+    sprintf(b, "%s\\MODE.txt", mod_dir());
+    if (GetFileAttributesA(b) != INVALID_FILE_ATTRIBUTES) return b;
+    if (GetEnvironmentVariableA("USERPROFILE", t, MAX_PATH) > 0)
+    {
+        sprintf(b, "%s\\Desktop\\MODE.txt", t);
+        if (GetFileAttributesA(b) != INVALID_FILE_ATTRIBUTES) return b;
+        sprintf(b, "%s\\MODE.txt", mod_dir());
+    }
+    return b;
+}
+#define LOGPATH  P_LOG()
+#define MODEPATH P_MODE()
+#define TIMEPATH P_TIME()
+#define CHARPATH P_CHAR()
 
 #define F_TARGET   0x00B6E6A0ULL
 #define PROLOG_LEN 15
@@ -2454,7 +2496,7 @@ static int enemy_attack_phase(unsigned long long ctr, unsigned int* oModel, unsi
     return 0;
 }
 
-#define SLOWPATH    "C:\\Users\\47297\\Desktop\\slow.txt"
+#define SLOWPATH    P_SLOW()
 #define ANIM_FRESH_MS  700      // "???????"???
 #define ABORT_MS       400      // ??????, ???????????
 #define FAST_MS        400      // 1act ??: ???????????????
@@ -3107,8 +3149,7 @@ static void fx_sting(void)
             return;
         }
     }
-    ps("C:\\Users\\47297\\Documents\\Codex\\2026-09-15\\ru-g\\sekiro-mod\\assets\\fx_warp.wav",
-       NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
+    ps(P_WAV(), NULL, SND_FILENAME | SND_ASYNC | SND_NODEFAULT);
 }
 
 // ---- ?????"??????"?? ----
